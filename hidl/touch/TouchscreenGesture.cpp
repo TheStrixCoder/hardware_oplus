@@ -20,6 +20,7 @@
 #include <android-base/logging.h>
 #include <android-base/strings.h>
 #include <android/binder_manager.h>
+#include <log/log.h>
 
 #include <TouchscreenGestureConfig.h>
 
@@ -53,9 +54,22 @@ Return<bool> TouchscreenGesture::setGestureEnabled(const Gesture& gesture, bool 
     int result;
 
     // Connect to IOplusTouch
-    const std::string instance = std::string() + IOplusTouch::descriptor + "/default";
-    mTouchService = IOplusTouch::fromBinder(
-            ndk::SpAIBinder(AServiceManager_waitForService(instance.c_str())));
+    std::string instance = std::string() + IOplusTouch::descriptor + "/default";
+    AIBinder* rawBinder = AServiceManager_checkService(instance.c_str());
+
+    if (rawBinder == nullptr) {
+        instance = std::string() + IOplusTouch::descriptor + "/oplus";
+        rawBinder = AServiceManager_checkService(instance.c_str());
+    }
+
+    ndk::SpAIBinder binder(rawBinder);
+
+    if (binder.get() != nullptr) {
+        mTouchService = IOplusTouch::fromBinder(binder);
+    } else {
+        ALOGE("Failed to connect to IOplusTouch service on both /default and /oplus instances.");
+        return true;
+    }
 
     // Read current value
     mTouchService->touchReadNodeFile(0, 21, &tmp);
