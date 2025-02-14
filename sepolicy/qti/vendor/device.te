@@ -1,6 +1,9 @@
 # Fingerprint
 type fingerprint_device, dev_type;
 
+# IR
+type oplus_consumer_ir_device, dev_type;
+
 # Reserve
 type vendor_reserve_partition, dev_type;
 
@@ -16,5 +19,11 @@ type oplus_touchdaemon_device, dev_type;
 # Ultrasound
 type ultrasound_device, dev_type;
 
+# Vibrator
+type aac_richtap_device, dev_type;
+
 # Wlchgmonitor
 type wlchg_device, dev_type;
+
+# Wlschgd
+type wlschgd_device, dev_type;
